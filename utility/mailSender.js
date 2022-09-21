@@ -12,37 +12,26 @@ const sendMail = async (email, subject, text, cb) => {
     await transporter.sendMail(
         {
           from: process.env.EMAIL,
-          to: "saqib.idrees95@gmail.com",
-          subject: "Sending Email using Node.js",
-          text: `${req.body.message}`,
-          attachments: [
-            {
+          to: email,
+          subject: subject,
+          text: `${text}`,
+        //   attachments: [
+        //     {
                 
-                ...req.file,
-                filename : req.file?.originalname
-            },
-          ],
+        //         ...req.file,
+        //         filename : req.file?.originalname
+        //     },
+        //   ],
         },
         function (error, info) {
-            exec(`rm -f ${req.file.path}`, (error, stdout, stderr) => {
-                if (error) {
-                    console.log(`error: ${error.message}`);
-                    return;
-                }
-                if (stderr) {
-                    console.log(`stderr: ${stderr}`);
-                    return;
-                }
-                console.log(`stdout: ${stdout}`);
-            });
           if (error) {
-            console.log(error);
-            res.json(error);
+            return false
           } else {
-            console.log("Email sent: " + info.response);
-            res.json("Email sent: " + info.response);
+            return true
           }
         }
       );
 
 }
+
+module.exports = sendMail;

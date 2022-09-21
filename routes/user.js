@@ -3,6 +3,7 @@ const User = require('../models/user.model');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const userAuth = require('../utility/userAuth');
+const sendMail = require('../utility/mailSender');
 
 router.route('/').get((req, res) => {
     User.find()
@@ -50,9 +51,9 @@ router.route('/forgetPassword').post(async(req, res) => {
     const { email } = req.body;
     const user = await User.findOne({ email });
     if(!user) return res.status(400).json({ msg: "No account with this email has been registered." });
-   
-        // .then(user => res.status(user ? 200 : 404).json(user ?? 'User not found'))
-        // .catch(err => res.status(400).json('Error: ' + err));
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
+    const result = await sendMail(email, 'Password Reset', `Your password reset link is : http://localhost:3000/resetPassword/${user._id}/${token}`);
+    res.status(result ? 200 : 400).json(result ? 'Password reset link sent to your email' : 'Error sending password reset link');
 });
 
 

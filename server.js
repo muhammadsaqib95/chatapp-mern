@@ -11,6 +11,9 @@ const port = process.env.PORT || 9000;
 app.use(cors());
 app.use(express.json());
 app.use(upload.array());
+app.get('/',(req,res) => {
+    res.send('Hello World');
+    });
 
 const uri = process.env.MONGODB_URI;
 moongose.connect(uri);
