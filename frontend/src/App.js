@@ -1,24 +1,29 @@
-import logo from './logo.svg';
-import './App.css';
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import Login from "./components/user/Login";
+import Chat from "./components/user/Chat";
+import { useUserContext } from "./components/userAuth/user";
+import "@fontsource/gothic-a1/100.css";
+import "@fontsource/gothic-a1/200.css";
+import "@fontsource/gothic-a1/300.css";
+import "@fontsource/gothic-a1";
+import "@fontsource/gothic-a1/500.css";
+import "@fontsource/gothic-a1/600.css";
+import "@fontsource/gothic-a1/700.css";
+import "@fontsource/gothic-a1/800.css";
+import "@fontsource/gothic-a1/900.css";
 
 function App() {
+  const { user } = useUserContext();
+  console.log(user);
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/login" element={user ? <Navigate to={'/chat'} /> : <Login />} />
+          <Route path="/chat" element={user ? <Chat /> : <Navigate to={'/login'} /> } />
+        </Routes>
+      </BrowserRouter>
+    </>
   );
 }
 
