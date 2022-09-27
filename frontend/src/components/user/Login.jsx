@@ -26,36 +26,6 @@ export default function Login() {
     },
   });
 
-
-//   const userLogin = (event) => {
-//     event.preventDefault();
-//     console.log(userInput);
-//     var formdata = new FormData();
-// formdata.append("email", userInput.username);
-// formdata.append("password", userInput.password);
-
-// var requestOptions = {
-//   method: 'POST',
-//   body: formdata,
-//   redirect: 'follow'
-// };
-
-// fetch("user/login", requestOptions)
-//   .then(response => response.json())
-//   .then(result => {
-//     if(result.token)
-//     {
-//       localStorage.setItem('user_token', result.token);
-//       navigate('/chat');
-//     }
-//     else{
-//       setUserInput({...userInput, error: result.message});
-//     }
-//   })
-//   .catch(error => console.log('error', error));
-
-//   };
-
   return (
     <div className="w-screen h-screen flex items-center justify-center">
       <div className="bg-white rounded-md min-w-[546px] flex flex-col items-center py-14 auth-shadow">
