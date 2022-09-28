@@ -14,13 +14,14 @@ import "@fontsource/gothic-a1/900.css";
 
 function App() {
   const { user } = useUserContext();
-  console.log(user);
+  // console.log(user);
   return (
     <>
       <BrowserRouter>
         <Routes>
           <Route path="/login" element={user ? <Navigate to={'/chat'} /> : <Login />} />
-          <Route path="/chat" element={user ? <Chat /> : <Navigate to={'/login'} /> } />
+          <Route path="/chat/*" element={user ? <Chat /> : <Navigate to={'/login'} /> } />
+          <Route path="/*" element={<Navigate to={'/login'} />} />
         </Routes>
       </BrowserRouter>
     </>

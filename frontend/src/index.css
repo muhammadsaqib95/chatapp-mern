@@ -19,3 +19,26 @@ code {
 .header-shadow{
   box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.25);
 }
+.chat-header-shadow{
+  box-shadow: 0px 2px 1px rgba(0, 0, 0, 0.25);
+}
+@layer components {
+  .sent {
+    background-color: #2671E1;
+    color: white;
+    width: max-content;
+    max-width: 510px;
+    border-radius: 22px 0px 22px 22px;
+    margin: theme('spacing.2');
+    align-self: flex-end;
+  }
+  .received{
+    background-color: #EAEEF2;
+    color: #000000;
+    width: max-content;
+    max-width: 510px;
+    border-radius: 0px 22px 22px 22px;
+    margin: theme('spacing.2');
+    align-self: flex-start;
+  }
+}

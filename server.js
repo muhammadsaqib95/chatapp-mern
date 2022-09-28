@@ -25,14 +25,14 @@ app.get("/", (req, res) => {
   res.send("Hello World");
 });
 io.on("connection", (socket) => {
-  console.log("a user connected", socket.id, socket.rooms);
-  socket.on("join", (room) => {
-    socket.join(room);
-    console.log("joined room", room);
-  });
-  socket.on("send-message", (data) => {
-    console.log("user send message",data);
-  });
+  // console.log("a user connected", socket.id, socket.rooms);
+  // socket.on("join", (room) => {
+  //   socket.join(room);
+  //   console.log("joined room", room);
+  // });
+  // socket.on("send-message", (data) => {
+  //   console.log("user send message",data);
+  // });
 
   socket.on("disconnect", (da) => {
     console.log("user disconnected", socket.id);
@@ -57,9 +57,11 @@ connection.once("open", (res) => {
 
 const userRouter = require("./routes/user");
 const chatRouter = require("./routes/chat");
+chatRouter.start(io)
 app.use("/user", userRouter);
-app.use("/chat", chatRouter);
+app.use("/chat", chatRouter.router);
 
 server.listen(port, () => {
   console.log(`Server is running on port: ${port}`);
 });
+
