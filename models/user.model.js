@@ -6,6 +6,7 @@ const userSchema = new Schema({
     email: {type : String, requird: true, unqiue: true, trim: true},
     password: {type: String, required: true, trim: true},
     displayName: {type: String, required: true, trim: true},
+    isOnline : {type: Boolean, default: false},
 },
 {
     timestamps: true,

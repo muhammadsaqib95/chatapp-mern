@@ -7,45 +7,57 @@ require("dotenv").config();
 const multer = require("multer");
 var upload = multer({ dest: "uploads/" });
 const { Server } = require("socket.io");
+const { instrument } = require("@socket.io/admin-ui");
+const jwt  = require("jsonwebtoken");
 
-app.use(cors());
+app.use(cors(
+{
+    origin: ["*", 'https://admin.socket.io', 'http://localhost:3000'],
+    methods: ["GET", "POST", "PUT", "DELETE"],
+
+}
+
+));
 const server = http.createServer(app);
 app.use(express.json());
 app.use(upload.array());
 const io = new Server(server, {
     cors: {
-        origin: "*",
-        methods: ["GET", "POST"],
+        origin: ["*", 'https://admin.socket.io', 'http://localhost:3000'],
+        methods: ["GET", "POST", "PUT", "DELETE"],
+        credentials: true
     },
 });
 
 // const app = express();
 const port = process.env.PORT || 3001;
 app.get("/", (req, res) => {
-  res.send("Hello World");
+  res.send("This is chat app home");
 });
-io.on("connection", (socket) => {
-  // console.log("a user connected", socket.id, socket.rooms);
-  // socket.on("join", (room) => {
-  //   socket.join(room);
-  //   console.log("joined room", room);
-  // });
-  // socket.on("send-message", (data) => {
-  //   console.log("user send message",data);
-  // });
+io.use((socket, next) => {
+    const token = socket.handshake.auth.token;
+    if (!token) {
+        return next(new Error('authentication error'));
+    }
+    const verified = jwt.verify(token, process.env.JWT_SECRET);
+    socket.user = verified;
+    return next();
+});
 
-  socket.on("disconnect", (da) => {
-    console.log("user disconnected", socket.id);
-  }
-  );
-});
+// io.on("connection", (socket) => {
+//   socket.on("disconnect", (da) => {
+//     console.log("user disconnected", socket.id);
+//   }
+//   );
+// });
 
 
 const uri = process.env.MONGODB_URI;
-moongose.connect(uri);
+moongose.connect(uri,{ dbName: 'chatapp' });
 const connection = moongose.connection;
-connection.once("open", (res) => {
+connection.once("open", () => {
   console.log("MongoDB database connection established successfully");
+  // console.log(moongose);
 });
 
 // const socket = require("socket.io-client")(":3001/socket");
@@ -60,6 +72,10 @@ const chatRouter = require("./routes/chat");
 chatRouter.start(io)
 app.use("/user", userRouter);
 app.use("/chat", chatRouter.router);
+
+instrument(io, {
+  auth: false
+});
 
 server.listen(port, () => {
   console.log(`Server is running on port: ${port}`);

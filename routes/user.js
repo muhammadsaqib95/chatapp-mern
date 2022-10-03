@@ -37,12 +37,14 @@ router.route("/getUser").get(userAuth, async (req, res) => {
 });
 
 router.route("/login").post(async (req, res) => {
+  
   const { email, password } = req.body;
   const user = await User.findOne({ email });
   if (!user)
     return res
       .status(400)
       .json({ msg: "No account with this email has been registered." });
+      console.log('edfe',user);
   const isMatch = await bcrypt.compare(password, user.password);
   if (!isMatch) return res.status(400).json({ msg: "Invalid credentials." });
   const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
