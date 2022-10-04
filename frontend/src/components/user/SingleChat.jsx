@@ -25,7 +25,7 @@ function SingleChat({newChat, setNewChat}) {
   }, [data, id]);
   useEffect(() => {
     if(currentChat?.messages?.length > 0){
-      lastMessageRef.current.scrollIntoView({ behavior: "smooth" });
+      lastMessageRef?.current?.scrollIntoView({ behavior: "smooth" });
     }
   }, [currentChat]);
 
@@ -40,15 +40,23 @@ function SingleChat({newChat, setNewChat}) {
     <>
     {
       newChat ? (
-        <div className="w-full">
-          <h1 className="font-semibold text-lg pl-7 pt-6 pb-2">New Message To:</h1>
+        <div className="w-full h-full" >
+          <h1 className="font-semibold text-lg pl-7 pt-6 pb-2 border-b border-b-[#EAEEF2]">New Message To:</h1>
+          <div className="w-full chat-header-shadow"><input type='text' placeholder='Type name or email here' className="w-full pl-7 py-3 text-sm"/></div>
+          <div
+          style={{ height: "calc(100% - 200px)" }}
+          >
+            <div className="w-full h-full flex items-center justify-center">
+              <h1 className="font-semibold text-lg">No Chat Selected</h1>
+              </div>
+          </div>
         </div>)
         :
     <>
       <div className="w-full chat-header-shadow">
         <div className="flex justify-between items-center py-4 px-4">
           <div className="flex items-center gap-4">
-            <div className="relative min-w-[56px] w-14 min-h-[56px] h-14 rounded-full flex items-center justify-center bg-[#D6E1E3]">
+            <div className="relative min-w-[56px] w-14 min-h-[56px] h-14 rounded-full flex items-center justify-center bg-[#2671e121]">
               {
                 currentChat?.users?.filter(
                   (user) => user._id !== userData?.id
@@ -114,8 +122,6 @@ function SingleChat({newChat, setNewChat}) {
             </div>
           </div>
       }
-    </>
-}
       <div className="border-t border-t-[#E0E0E0] py-6 px-10 flex items-center gap-3">
         <input
           type="text"
@@ -163,6 +169,8 @@ function SingleChat({newChat, setNewChat}) {
           </svg>
         </div>
       </div>
+    </>
+}
     </>
   );
 }

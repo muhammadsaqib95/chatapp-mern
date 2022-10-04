@@ -37,14 +37,13 @@ router.route("/getUser").get(userAuth, async (req, res) => {
 });
 
 router.route("/login").post(async (req, res) => {
-  
   const { email, password } = req.body;
   const user = await User.findOne({ email });
   if (!user)
     return res
       .status(400)
       .json({ msg: "No account with this email has been registered." });
-      console.log('edfe',user);
+  console.log("edfe", user);
   const isMatch = await bcrypt.compare(password, user.password);
   if (!isMatch) return res.status(400).json({ msg: "Invalid credentials." });
   const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
@@ -86,6 +85,27 @@ router.route("/forgetPassword").post(async (req, res) => {
         ? "Password reset link sent to your email"
         : "Error sending password reset link"
     );
+});
+
+router.route("/:name").get((req, res) => {
+  User.find({
+    $or: [
+      { displayName: { $regex: req.params.name, $options: "i" } },
+      { email: { $regex: req.params.name, $options: "i" } },
+    ],
+  })
+    .then((users) =>
+      res
+        .status(200)
+        .json(
+          users.map((user) => ({
+            displayName: user.displayName,
+            email: user.email,
+            id: user._id,
+          }))
+        )
+    )
+    .catch((err) => res.status(400).json("Error: " + err));
 });
 
 module.exports = router;
