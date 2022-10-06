@@ -1,4 +1,4 @@
-import { Children } from "react";
+import { Children, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useUserDetails } from "../../Api/userAuth";
 import { useUserAllChats } from "../../Api/userChat";
@@ -8,6 +8,11 @@ export default function ChatList({setNewChat}) {
   // const { isLoading, data, error } = useUserAllChats();
   const  chatRoute  = useParams();
   const data = useSelector((state) => state.chat.chats);
+
+// useEffect(() => {
+  // console.log(x);
+  // const x = 9;
+// }, []);
 
   // console.log(data, userData);
   return (

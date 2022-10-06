@@ -15,7 +15,6 @@ export const chatSlice = createSlice({
         }
     },
     newMessage: (state, action) => {
-        console.log('login reducer', action);
         let chats = [...state.chats];
         let newArray = chats.map((chat) => {
             if (chat._id === action.payload.chatId) {

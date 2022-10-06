@@ -1,8 +1,6 @@
 const router = require('express').Router();
 const Chat = require('../models/chat.model');
 const userAuth = require('../utility/userAuth');
-const User = require("../models/user.model");
-// const io = require('../server');
 var socket1;
 router.route('/').get(userAuth, (req, res) => {
     Chat.find({ users: req.user.id }).populate('users', ['displayName', 'email', 'isOnline', 'updatedAt'])
