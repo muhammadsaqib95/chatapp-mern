@@ -14,7 +14,7 @@ export function sendChatMessage(data) {
     for (const key in data) {
         if (data[key]) {
             formdata.append(key, data[key]);
-        }
+        } 
     }  
     
     var requestOptions = {
