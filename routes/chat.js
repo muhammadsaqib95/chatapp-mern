@@ -3,6 +3,7 @@ const Chat = require("../models/chat.model");
 const userAuth = require("../utility/userAuth");
 var socket1;
 router.route("/").get(userAuth, (req, res) => {
+  console.log("edfe", req.ip, req.socket.remoteAddress, req.headers);
   Chat.find({ users: req.user.id })
     .populate("users", ["displayName", "email", "isOnline", "updatedAt"])
     .sort({ updatedAt: -1 })

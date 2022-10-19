@@ -19,6 +19,7 @@ app.use(cors(
 
 ));
 const server = http.createServer(app);
+app.set('trust proxy', true);
 app.use(express.json());
 app.use(upload.array());
 const io = new Server(server, {
