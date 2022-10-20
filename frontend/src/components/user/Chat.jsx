@@ -6,6 +6,8 @@ import { useUserDetails } from "../../Api/userAuth";
 import ChatList from "./ChatList";
 import SingleChat from "./SingleChat";
 import { useSelector, useDispatch } from "react-redux";
+import { useUserContext } from "../userAuth/user";
+
 import {
   getAllChat,
   newMessage,
@@ -13,10 +15,12 @@ import {
   userOffline,
 } from "../../redux/reducer/chatSlice";
 import { useUserAllChats } from "../../Api/userChat";
+import ChatWidget from "../../assets/svg/ChatWidget";
 // const socket = io.connect("http://localhost:3001");
 function Chat() {
   const [socket, setSocket] = useState(null);
   const [newChat, setNewChat] = useState(false);
+  const { setUser } = useUserContext();
   const dispatch = useDispatch();
   const { isLoading, data, error } = useUserDetails();
   const { data: userAllChats } = useUserAllChats();
@@ -35,7 +39,9 @@ function Chat() {
   }, [userAllChats, data]);
   useEffect(() => {
     if (data) {
-      socket.emit("join-room", { id: data?.id });
+      if (socket) {
+        socket.emit("join-room", { id: data?.id });
+      }
     }
   }, [data]);
   useEffect(() => {
@@ -43,6 +49,9 @@ function Chat() {
       socket.on("receive-message", (data) => {
         console.log("receive message on socket", data);
         dispatch(newMessage(data));
+      });
+      socket.on("temp", (data) => {
+        console.log("temp", data);
       });
       // socket.on("disconnect", () => {
       //   console.log("disconnect");
@@ -71,7 +80,14 @@ function Chat() {
           <h1 className="font-bold text-2xl">Chat App</h1>
           <div className="flex items-center justify-center gap-7">
             <h2 className="font-bold text-xl">{data?.displayName}</h2>
-            <button className="bg-[#2671E1] font-semibold text-white rounded-md px-4 py-1">
+            <button
+              className="bg-[#2671E1] font-semibold text-white rounded-md px-4 py-1"
+              onClick={() => {
+                localStorage.removeItem("user_token");
+                setUser(null);
+                queryClient.clear();
+              }}
+            >
               Logout
             </button>
           </div>
@@ -94,10 +110,13 @@ function Chat() {
                 exact
                 index
                 element={
-                  <div className="flex items-center justify-center h-[410px]">
-                    <h1 className="text-[#878787] text-lg">
-                      Select a chat to start messaging
-                    </h1>
+                  <div className="flex items-center justify-center h-full">
+                    <div className="flex flex-col items-center">
+                      <ChatWidget className='h-[300px]' />
+                      <h1 className="text-[#878787] text-lg mt-6">
+                        Select a chat to start messaging
+                      </h1>
+                    </div>
                   </div>
                 }
               />

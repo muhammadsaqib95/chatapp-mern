@@ -12,7 +12,7 @@ const jwt  = require("jsonwebtoken");
 
 app.use(cors(
 {
-    origin: ["*", 'https://admin.socket.io', 'http://localhost:3000'],
+    origin: "*",
     methods: ["GET", "POST", "PUT", "DELETE"],
 
 }

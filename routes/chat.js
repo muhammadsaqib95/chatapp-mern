@@ -64,6 +64,8 @@ module.exports = {
   start: function (io) {
     socket1 = io;
     socket1.on("connection", function (socket) {
+      // socket.emit("temp", JSON.stringify(socket));
+      console.log("user connected", socket.handshake.address);
       // console.log('a user connected', socket.user.id);
       // User.findByIdAndUpdate(socket.user.id, { $set: { isOnline: true } }, { new: true })
       // .then(user => {

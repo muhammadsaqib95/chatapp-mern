@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { queryClient } from "../../index";
 import { userLogin } from "../../Api/userAuth";
 import { useUserContext } from "../userAuth/user";
+import Loader from "../Loader/index";
 export default function Login() {
   const navigate = useNavigate();
   const {setUser} = useUserContext();
@@ -26,7 +27,10 @@ export default function Login() {
     },
   });
 
-  return (
+  return (<>
+  {
+    loginMutation.isLoading ? <Loader /> : ''
+  }
     <div className="w-screen h-screen flex items-center justify-center">
       <div className="bg-white rounded-md min-w-[546px] flex flex-col items-center py-14 auth-shadow">
         <h1 className="font-bold text-2xl mb-10">Chat App</h1>
@@ -58,5 +62,6 @@ export default function Login() {
         </div>
       </div>
     </div>
+    </>
   );
 }
