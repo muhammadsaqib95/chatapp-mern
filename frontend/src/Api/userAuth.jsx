@@ -17,7 +17,7 @@ export const userLogin = async ({ username, password }) => {
     .catch((error) => console.log("error", error));
 };
 
-export const getUser = () => {
+export const getUser = async() => {
   return axiosInstance.get("http://localhost:3001/user/getUser")
     .then((response) => response.data)
     .catch((error) => console.log("error", error));
@@ -26,4 +26,13 @@ export const getUser = () => {
 export function useUserDetails() {
     return useQuery(["user"], getUser);
 
+}
+
+export async function searchUser(user) {
+  try {
+    const response = await axiosInstance.get(`http://localhost:3001/user/${user}`);
+    return response.data;
+  } catch (error) {
+    return console.log("error", error);
+  }
 }

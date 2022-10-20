@@ -10,6 +10,7 @@ import ScrollToBottom from "react-scroll-to-bottom";
 import { newMessage } from "../../redux/reducer/chatSlice";
 import { useSelector, useDispatch } from "react-redux";
 import { Peer } from "peerjs";
+import NewChat from "./NewChat";
 
 function SingleChat({ newChat, setNewChat }) {
   const lastMessageRef = useRef(null);
@@ -57,23 +58,7 @@ function SingleChat({ newChat, setNewChat }) {
   return (
     <>
       {newChat ? (
-        <div className="w-full h-full">
-          <h1 className="font-semibold text-lg pl-7 pt-6 pb-2 border-b border-b-[#EAEEF2]">
-            New Message To:
-          </h1>
-          <div className="w-full chat-header-shadow">
-            <input
-              type="text"
-              placeholder="Type name or email here"
-              className="w-full pl-7 py-3 text-sm"
-            />
-          </div>
-          <div style={{ height: "calc(100% - 200px)" }}>
-            <div className="w-full h-full flex items-center justify-center">
-              <h1 className="font-semibold text-lg">No Chat Selected</h1>
-            </div>
-          </div>
-        </div>
+        <NewChat />
       ) : (
         <>
           <div className="w-full chat-header-shadow">
