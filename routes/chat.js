@@ -3,7 +3,6 @@ const Chat = require("../models/chat.model");
 const userAuth = require("../utility/userAuth");
 var socket1;
 router.route("/").get(userAuth, (req, res) => {
-  console.log("edfe", req.ip, req.socket.remoteAddress, req.headers);
   Chat.find({ users: req.user.id })
     .populate("users", ["displayName", "email", "isOnline", "updatedAt"])
     .sort({ updatedAt: -1 })
@@ -65,8 +64,6 @@ module.exports = {
     socket1 = io;
     socket1.on("connection", function (socket) {
       // socket.emit("temp", JSON.stringify(socket));
-      console.log("user connected", socket.handshake.address);
-      // console.log('a user connected', socket.user.id);
       // User.findByIdAndUpdate(socket.user.id, { $set: { isOnline: true } }, { new: true })
       // .then(user => {
       //     // console.log(user , ' is online');

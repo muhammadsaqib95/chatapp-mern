@@ -37,7 +37,6 @@ router.route("/getUser").get(userAuth, async (req, res) => {
 });
 
 router.route("/login").post(async (req, res) => {
-  console.log("edfe", req.ip, req.socket.remoteAddress, req.headers);
   const { email, password } = req.body;
   const user = await User.findOne({ email });
   if (!user)
@@ -88,10 +87,11 @@ router.route("/forgetPassword").post(async (req, res) => {
 });
 
 router.route("/:name").get((req, res) => {
+  let name = req.params.name.trim();
   User.find({
     $or: [
-      { displayName: { $regex: req.params.name, $options: "i" } },
-      { email: { $regex: req.params.name, $options: "i" } },
+      { displayName: { $regex: name, $options: "i" } },
+      { email: { $regex: name, $options: "i" } },
     ],
   })
     .then((users) =>
