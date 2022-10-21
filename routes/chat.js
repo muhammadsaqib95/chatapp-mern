@@ -1,7 +1,21 @@
 const router = require("express").Router();
 const Chat = require("../models/chat.model");
 const userAuth = require("../utility/userAuth");
+// const debounce = require("../utility/debounce");
+function debounce  (cb, delay = 1000) {
+  let timeout;
+  return (...args) => {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => {
+      cb(...args);
+    }, delay);
+  };
+}
+
 var socket1;
+const UserNotTyping = debounce((socket, data) => {
+  socket.broadcast.emit("notTyping",data);
+}, 2000);
 router.route("/").get(userAuth, (req, res) => {
   Chat.find({ users: req.user.id })
     .populate("users", ["displayName", "email", "isOnline", "updatedAt"])
@@ -63,6 +77,7 @@ module.exports = {
   start: function (io) {
     socket1 = io;
     socket1.on("connection", function (socket) {
+      console.log("a user connected", socket.id);
       // socket.emit("temp", JSON.stringify(socket));
       // User.findByIdAndUpdate(socket.user.id, { $set: { isOnline: true } }, { new: true })
       // .then(user => {
@@ -73,6 +88,14 @@ module.exports = {
         socket.join(room.id);
         //   console.log("joined room from chat", room);
       });
+      socket.on('typing' , (data) => {
+        console.log('typing' );
+        socket.broadcast.emit('typing', data);
+        UserNotTyping(socket, data);
+
+
+        // socket.broadcast.to(data.room).emit('typing' , data);
+      })
       // socket.on('disconnect', function() {
       //     console.log('user disconnected', socket.user.id);
       //     User.findByIdAndUpdate(socket.user.id, { $set: { isOnline: false } }, { new: true })

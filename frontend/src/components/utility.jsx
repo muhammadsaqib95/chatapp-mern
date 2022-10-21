@@ -8,7 +8,7 @@ export function debounce(cb, delay = 1000) {
     }
   }
   
-export function throttle(cb, delay = 1000) {
+export function throttle(cb, delay = 1000, immediate = false) {
     let shouldWait = false
     let waitingArgs
     const timeoutFunc = () => {

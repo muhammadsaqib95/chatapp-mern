@@ -5,14 +5,19 @@ import { sendChatMessage, useUserAllChats } from "../../Api/userChat";
 import moment from "moment";
 import Moment from "react-moment";
 import { useMutation } from "@tanstack/react-query";
-import { queryClient } from "../../index";
-import ScrollToBottom from "react-scroll-to-bottom";
 import { newMessage } from "../../redux/reducer/chatSlice";
 import { useSelector, useDispatch } from "react-redux";
-import { Peer } from "peerjs";
+// import { Peer } from "peerjs";
 import NewChat from "./NewChat";
+import { throttle } from "../utility";
+import { useSocket } from "../../Providers/socket";
+const throttledFunction = throttle((text, socket, user, chat) => {
+    // console.log("throttledFunction", text);
+    socket.emit('typing', {user, chat});
+  }, 2000);
 
 function SingleChat({ newChat, setNewChat }) {
+  const { socket } = useSocket();
   const lastMessageRef = useRef(null);
   const dispatch = useDispatch();
   const { id } = useParams();
@@ -39,22 +44,26 @@ function SingleChat({ newChat, setNewChat }) {
     },
   });
 
-  useEffect(() => {
-    if (userData?.id) {
-      const peer = new Peer(userData?.id);
-      peer.on("open", (id) => {
-        console.log("peer id", id);
-      });
-      peer.on("call", (call) => {
-        console.log("call", call);
-        call.answer();
-        call.on("stream", (stream) => {
-          console.log("stream", stream);
-        });
-      });
-    }
-  }, [userData]);
-
+  // useEffect(() => {
+  //   if (userData?.id) {
+  //     const peer = new Peer(userData?.id);
+  //     peer.on("open", (id) => {
+  //       console.log("peer id", id);
+  //     });
+  //     peer.on("call", (call) => {
+  //       console.log("call", call);
+  //       call.answer();
+  //       call.on("stream", (stream) => {
+  //         console.log("stream", stream);
+  //       });
+  //     });
+  //   }
+  // }, [userData]);
+  function hanldeMessageType(e) {
+    setUserInput(e.target.value);
+    throttledFunction(e.target.value, socket, userData?.id, currentChat?._id);
+  }
+console.log("currentChat", data);
   return (
     <>
       {newChat ? (
@@ -80,7 +89,12 @@ function SingleChat({ newChat, setNewChat }) {
                     }
                   </h4>
                   <p className="text-[#878787] text-xs">
-                    last online:{" "}
+                  {currentChat?.users?.filter(
+                          (user) => user._id !== userData?.id
+                        )[0]?.isTyping
+                          ? "typing..."
+                          : <>
+                    last online: &nbsp;
                     <Moment fromNow>
                       {
                         currentChat?.users?.filter(
@@ -88,6 +102,8 @@ function SingleChat({ newChat, setNewChat }) {
                         )[0]?.updateAt
                       }
                     </Moment>
+                    </>
+                    }
                   </p>
                 </div>
               </div>
@@ -136,7 +152,7 @@ function SingleChat({ newChat, setNewChat }) {
               placeholder="Write your message"
               className={"bg-[#EAEEF2] rounded-full py-3 px-6 w-full"}
               value={userInput}
-              onChange={(e) => setUserInput(e.target.value)}
+              onChange={hanldeMessageType}
               onKeyPress={(e) => {
                 if (e.key === "Enter") {
                   sendMessage.mutate({

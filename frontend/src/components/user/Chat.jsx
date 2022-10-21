@@ -1,36 +1,30 @@
 import { useEffect, useState } from "react";
 import { Routes, Route } from "react-router-dom";
-import io from "socket.io-client";
 import { queryClient } from "../../index";
 import { useUserDetails } from "../../Api/userAuth";
 import ChatList from "./ChatList";
 import SingleChat from "./SingleChat";
-import { useSelector, useDispatch } from "react-redux";
+import { useDispatch } from "react-redux";
 import { useUserContext } from "../userAuth/user";
+import { useSocket } from "../../Providers/socket";
 
 import {
   getAllChat,
   newMessage,
   userOnline,
   userOffline,
+  userTyping,
+  userStopTyping,
 } from "../../redux/reducer/chatSlice";
 import { useUserAllChats } from "../../Api/userChat";
 import ChatWidget from "../../assets/svg/ChatWidget";
-// const socket = io.connect("http://localhost:3001");
 function Chat() {
-  const [socket, setSocket] = useState(null);
+  const { socket } = useSocket();
   const [newChat, setNewChat] = useState(false);
   const { setUser } = useUserContext();
   const dispatch = useDispatch();
   const { isLoading, data, error } = useUserDetails();
   const { data: userAllChats } = useUserAllChats();
-  useEffect(() => {
-    setSocket(() =>
-      io.connect("http://localhost:3001", {
-        auth: { token: localStorage.getItem("user_token") },
-      })
-    );
-  }, []);
 
   useEffect(() => {
     if (userAllChats && data) {
@@ -43,16 +37,24 @@ function Chat() {
         socket.emit("join-room", { id: data?.id });
       }
     }
+    return () => {
+      socket.off("join-room");
+    };
   }, [data]);
   useEffect(() => {
     if (socket) {
       socket.on("receive-message", (data) => {
-        console.log("receive message on socket", data);
         dispatch(newMessage(data));
       });
-      socket.on("temp", (data) => {
-        console.log("temp", data);
+      socket.on("typing", (data) => {
+        console.log("typing", data);
+        dispatch(userTyping(data));
       });
+      socket.on("notTyping", (data) => {
+        console.log("notTyping", data);
+        dispatch(userStopTyping(data));
+      });
+
       // socket.on("disconnect", () => {
       //   console.log("disconnect");
       //   setSocket(() =>
@@ -70,6 +72,13 @@ function Chat() {
       //   console.log("this user is offline", data);
       //   dispatch(userOffline({ userId: data }));
       // });
+    }
+    return () => {
+      socket.off("receive-message");
+      socket.off("typing");
+      socket.off("notTyping");
+      // socket.off("user-online");
+      // socket.off("user-offline");
     }
   }, [socket]);
 
