@@ -113,7 +113,7 @@ function SingleChat({ newChat, setNewChat }) {
               id="chat-scroll"
             >
               <div ref={lastMessageRef}></div>
-              <div className="w-full px-2 md:px-10 h-max flex flex-col transition-all duration-500">
+              <div className="w-full px-2 md:px-4 h-max flex flex-col transition-all duration-500">
                 {Children.toArray(
                   currentChat.messages?.map((message, index) => {
                     return (

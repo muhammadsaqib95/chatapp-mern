@@ -35,7 +35,7 @@ router.route("/create-chat").post(userAuth, (req, res) => {
 });
 
 router.route("/send-message").post(userAuth, async (req, res) => {
-  const { chatId, message, receiverId } = req.body;
+  const { chatId, message, receiverId, title } = req.body;
   if (receiverId) {
     const users = [req.user.id, receiverId];
     const newChat = new Chat({ users, title, message });
