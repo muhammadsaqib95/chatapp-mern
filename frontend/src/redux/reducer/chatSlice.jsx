@@ -85,14 +85,21 @@ export const chatSlice = createSlice({
     userOnline: (state, action) => {
         let chats = [...state.chats];
         let newArray = chats.map((chat) => {
-            chat.user.forEach((user) => {
-                if (user._id === action.payload.userId) {
-                    user.online = true;
+                let users = [...chat.users];
+                let newUsers = users.map((user) => {
+                    if (user._id === action.payload.userId) {
+                        return {
+                            ...user,
+                            isOnline: true
+                        }
+                    }
+                    return user;
+                })
+                return {
+                    ...chat,
+                    users: newUsers
                 }
-            })
-            return chat;
-        })
-            
+        });
         return {
             ...state,
             chats: newArray
@@ -101,14 +108,22 @@ export const chatSlice = createSlice({
     userOffline: (state, action) => {
         let chats = [...state.chats];
         let newArray = chats.map((chat) => {
-            chat.user.forEach((user) => {
+            let users = [...chat.users];
+            let newUsers = users.map((user) => {
                 if (user._id === action.payload.userId) {
-                    user.online = false;
-                    user.updatedAt = new Date();
+                    return {
+                        ...user,
+                        isOnline: false,
+                        updatedAt: new Date()
+                    }
                 }
+                return user;
             })
-            return chat;
-        })
+            return {
+                ...chat,
+                users: newUsers
+            }
+    });
         return {
             ...state,
             chats: newArray

@@ -47,11 +47,9 @@ function Chat() {
         dispatch(newMessage(data));
       });
       socket.on("typing", (data) => {
-        console.log("typing", data);
         dispatch(userTyping(data));
       });
       socket.on("notTyping", (data) => {
-        console.log("notTyping", data);
         dispatch(userStopTyping(data));
       });
 
@@ -64,21 +62,19 @@ function Chat() {
       //   );
       //   socket.emit("join-room", { id: data?.id });
       // });
-      // socket.on("user-online", (data) => {
-      //   console.log("this user is online", data);
-      //   dispatch(userOnline({ userId: data }));
-      // });
-      // socket.on("user-offline", (data) => {
-      //   console.log("this user is offline", data);
-      //   dispatch(userOffline({ userId: data }));
-      // });
+      socket.on("user-online", (data) => {
+        dispatch(userOnline({ userId: data }));
+      });
+      socket.on("user-offline", (data) => {
+        dispatch(userOffline({ userId: data }));
+      });
     }
     return () => {
       socket.off("receive-message");
       socket.off("typing");
       socket.off("notTyping");
-      // socket.off("user-online");
-      // socket.off("user-offline");
+      socket.off("user-online");
+      socket.off("user-offline");
     }
   }, [socket]);
 

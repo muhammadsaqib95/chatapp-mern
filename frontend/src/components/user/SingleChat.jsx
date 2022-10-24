@@ -12,9 +12,9 @@ import NewChat from "./NewChat";
 import { throttle } from "../utility";
 import { useSocket } from "../../Providers/socket";
 const throttledFunction = throttle((text, socket, user, chat) => {
-    // console.log("throttledFunction", text);
-    socket.emit('typing', {user, chat});
-  }, 2000);
+  // console.log("throttledFunction", text);
+  socket.emit("typing", { user, chat });
+}, 2000);
 
 function SingleChat({ newChat, setNewChat }) {
   const { socket } = useSocket();
@@ -25,10 +25,15 @@ function SingleChat({ newChat, setNewChat }) {
   const data = useSelector((state) => state.chat.chats);
 
   const [currentChat, setCurrentChat] = useState({});
+  const [otherUser, setOtherUser] = useState({});
   const [userInput, setUserInput] = useState("");
   useEffect(() => {
     if (data) {
-      setCurrentChat(() => data?.filter((chat) => chat._id === id)[0] ?? {});
+      let chat = data?.filter((chat) => chat._id === id)[0];
+      setCurrentChat(() => chat ?? {});
+      setOtherUser(
+        () => chat?.users.filter((user) => user._id !== userData?.id)[0] ?? {}
+      );
     }
   }, [data, id]);
   useEffect(() => {
@@ -63,7 +68,6 @@ function SingleChat({ newChat, setNewChat }) {
     setUserInput(e.target.value);
     throttledFunction(e.target.value, socket, userData?.id, currentChat?._id);
   }
-console.log("currentChat", data);
   return (
     <>
       {newChat ? (
@@ -73,37 +77,30 @@ console.log("currentChat", data);
           <div className="w-full chat-header-shadow">
             <div className="flex justify-between items-center py-4 px-4">
               <div className="flex items-center gap-4">
-                <div className="relative min-w-[56px] w-14 min-h-[56px] h-14 rounded-full flex items-center justify-center bg-[#2671e121]">
+                <div className="relative min-w-[56px] w-14 min-h-[56px] h-14 rounded-full flex items-center justify-center bg-[#2671e121] uppercase font-bold">
                   {
-                    currentChat?.users?.filter(
-                      (user) => user._id !== userData?.id
-                    )[0]?.displayName[0]
+                    otherUser?.displayName?.[0]
                   }
                 </div>
                 <div>
                   <h4 className="font-semibold text-base">
                     {
-                      currentChat?.users?.filter(
-                        (user) => user._id !== userData?.id
-                      )[0]?.displayName
+                      otherUser?.displayName
                     }
                   </h4>
                   <p className="text-[#878787] text-xs">
-                  {currentChat?.users?.filter(
-                          (user) => user._id !== userData?.id
-                        )[0]?.isTyping
-                          ? "typing..."
-                          : <>
-                    last online: &nbsp;
-                    <Moment fromNow>
-                      {
-                        currentChat?.users?.filter(
-                          (user) => user._id !== userData?.id
-                        )[0]?.updateAt
-                      }
-                    </Moment>
-                    </>
-                    }
+                    {otherUser?.isTyping ? (
+                      "Typing..."
+                    ) : otherUser.isOnline ? 'Online' : (
+                      <>
+                        Last online: &nbsp;
+                        <Moment fromNow>
+                          {
+                            otherUser?.updatedAt
+                          }
+                        </Moment>
+                      </>
+                    )}
                   </p>
                 </div>
               </div>
@@ -119,13 +116,11 @@ console.log("currentChat", data);
               <div className="w-full px-2 md:px-10 h-max flex flex-col transition-all duration-500">
                 {Children.toArray(
                   currentChat.messages?.map((message, index) => {
-                  return (
+                    return (
                       <>
                         {message.sender !== userData.id && (
                           <p className="text-[10px] text-[#706E6D] ml-2 -mb-1">
-                            {currentChat.users.filter(
-                              (user) => user._id !== userData.id
-                            )[0].displayName ?? ""}
+                            {otherUser.displayName ?? ""}
                           </p>
                         )}
                         <div

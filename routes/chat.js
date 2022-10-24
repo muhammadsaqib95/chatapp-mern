@@ -1,7 +1,7 @@
 const router = require("express").Router();
 const Chat = require("../models/chat.model");
 const userAuth = require("../utility/userAuth");
-// const debounce = require("../utility/debounce");
+const User = require("../models/user.model");
 function debounce  (cb, delay = 1000) {
   let timeout;
   return (...args) => {
@@ -77,33 +77,26 @@ module.exports = {
   start: function (io) {
     socket1 = io;
     socket1.on("connection", function (socket) {
-      console.log("a user connected", socket.id);
-      // socket.emit("temp", JSON.stringify(socket));
-      // User.findByIdAndUpdate(socket.user.id, { $set: { isOnline: true } }, { new: true })
-      // .then(user => {
-      //     // console.log(user , ' is online');
-      //     socket.broadcast.emit('user-online', user._id);
-      // })
       socket.on("join-room", (room) => {
         socket.join(room.id);
-        //   console.log("joined room from chat", room);
+        User.findByIdAndUpdate(room.id, { $set: { isOnline: true } }, { new: true })
+        .then(user => {
+            socket.broadcast.emit('user-online', user._id);
+        })
       });
       socket.on('typing' , (data) => {
-        console.log('typing' );
         socket.broadcast.emit('typing', data);
         UserNotTyping(socket, data);
-
-
         // socket.broadcast.to(data.room).emit('typing' , data);
       })
-      // socket.on('disconnect', function() {
-      //     console.log('user disconnected', socket.user.id);
-      //     User.findByIdAndUpdate(socket.user.id, { $set: { isOnline: false } }, { new: true })
-      //     .then(user => {
-      //         // console.log(user , ' is offline');
-      //         socket.broadcast.emit('user-offline', user._id);
-      //     })
-      // });
+      socket.on('disconnect', function() {
+          // console.log('user disconnected', socket.user.id);
+          User.findByIdAndUpdate(socket.user.id, { $set: { isOnline: false } }, { new: true })
+          .then(user => {
+              // console.log(user , ' is offline');
+              socket.broadcast.emit('user-offline', user._id);
+          })
+      });
       // console.log('a user connected from chat', socket.id, socket.rooms);
     });
   },

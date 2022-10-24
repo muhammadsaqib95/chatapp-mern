@@ -5,16 +5,10 @@ import { useUserAllChats } from "../../Api/userChat";
 import { useSelector } from "react-redux";
 export default function ChatList({setNewChat}) {
   const { data: userData } = useUserDetails();
-  // const { isLoading, data, error } = useUserAllChats();
   const  chatRoute  = useParams();
   const data = useSelector((state) => state.chat.chats);
 
-// useEffect(() => {
-  // console.log(x);
-  // const x = 9;
-// }, []);
 
-  // console.log(data, userData);
   return (
     <>
       <div className="flex justify-between mt-8">
@@ -85,12 +79,9 @@ export default function ChatList({setNewChat}) {
                   className={`flex items-center gap-4 py-4 pl-4 rounded-md hover:bg-[#F5F5F5] my-1 ${
                   chatRoute['*'] == chat._id ? "bg-[#2671e10d]" : "bg-transparent"
                   }`}
-                  style={{
-                    // backgroundColor: chatRoute['*'] == chat._id ? "#2671e10d" : "transparent",
-                  }}
                 >
-                  <div className="relative min-w-[56px] w-14 min-h-[56px] h-14 rounded-full flex items-center justify-center bg-[#2671e121]">
-                    {currentChat.displayName[0]}
+                  <div className="relative min-w-[56px] w-14 min-h-[56px] h-14 rounded-full flex items-center justify-center bg-[#2671e121] uppercase font-bold">
+                    {currentChat.displayName?.[0]}
                     <div
                       className="absolute right-0 bottom-[8px] min-w-[10px] w-[10px] min-h-[10px] h-[10px] bg-[#867E7E] rounded-full border border-white"
                       style={{
