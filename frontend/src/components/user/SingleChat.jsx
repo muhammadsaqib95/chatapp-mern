@@ -11,6 +11,17 @@ import { useSelector, useDispatch } from "react-redux";
 import NewChat from "./NewChat";
 import { throttle } from "../utility";
 import { useSocket } from "../../Providers/socket";
+import EmojiPicker, {
+  EmojiStyle,
+  SkinTones,
+  Theme,
+  Categories,
+  EmojiClickData,
+  Emoji,
+  SuggestionMode,
+  SkinTonePickerLocation,
+} from "emoji-picker-react";
+
 const throttledFunction = throttle((text, socket, user, chat) => {
   // console.log("throttledFunction", text);
   socket.emit("typing", { user, chat });
@@ -27,6 +38,12 @@ function SingleChat({ newChat, setNewChat }) {
   const [currentChat, setCurrentChat] = useState({});
   const [otherUser, setOtherUser] = useState({});
   const [userInput, setUserInput] = useState("");
+  const [showEmoji, setShowEmoji] = useState(false);
+
+  function onClick(emojiData, event) {
+    setUserInput(pre => pre + emojiData.emoji);
+  }
+
   useEffect(() => {
     if (data) {
       let chat = data?.filter((chat) => chat._id === id)[0];
@@ -78,27 +95,21 @@ function SingleChat({ newChat, setNewChat }) {
             <div className="flex justify-between items-center py-4 px-4">
               <div className="flex items-center gap-4">
                 <div className="relative min-w-[56px] w-14 min-h-[56px] h-14 rounded-full flex items-center justify-center bg-[#2671e121] uppercase font-bold">
-                  {
-                    otherUser?.displayName?.[0]
-                  }
+                  {otherUser?.displayName?.[0]}
                 </div>
                 <div>
                   <h4 className="font-semibold text-base">
-                    {
-                      otherUser?.displayName
-                    }
+                    {otherUser?.displayName}
                   </h4>
                   <p className="text-[#878787] text-xs">
                     {otherUser?.isTyping ? (
                       "Typing..."
-                    ) : otherUser.isOnline ? 'Online' : (
+                    ) : otherUser.isOnline ? (
+                      "Online"
+                    ) : (
                       <>
                         Last online: &nbsp;
-                        <Moment fromNow>
-                          {
-                            otherUser?.updatedAt
-                          }
-                        </Moment>
+                        <Moment fromNow>{otherUser?.updatedAt}</Moment>
                       </>
                     )}
                   </p>
@@ -142,6 +153,38 @@ function SingleChat({ newChat, setNewChat }) {
             </div>
           }
           <div className="border-t border-t-[#E0E0E0] py-6 px-10 flex items-center gap-3">
+            <div className="relative">
+              {showEmoji && (
+                <div className="absolute bottom-full">
+                  <EmojiPicker
+                    onEmojiClick={onClick}
+                    autoFocusSearch={false}
+                  />
+                </div>
+              )}
+              <svg
+                width="22"
+                height="22"
+                viewBox="0 0 22 22"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                className="cursor-pointer"
+                onClick={() => setShowEmoji(!showEmoji)}
+              >
+                <path
+                  d="M14.7916 9.91666C15.6891 9.91666 16.4166 9.18912 16.4166 8.29166C16.4166 7.39419 15.6891 6.66666 14.7916 6.66666C13.8942 6.66666 13.1666 7.39419 13.1666 8.29166C13.1666 9.18912 13.8942 9.91666 14.7916 9.91666Z"
+                  fill="#2671E1"
+                />
+                <path
+                  d="M7.20837 9.91666C8.10584 9.91666 8.83337 9.18912 8.83337 8.29166C8.83337 7.39419 8.10584 6.66666 7.20837 6.66666C6.31091 6.66666 5.58337 7.39419 5.58337 8.29166C5.58337 9.18912 6.31091 9.91666 7.20837 9.91666Z"
+                  fill="#2671E1"
+                />
+                <path
+                  d="M10.9891 0.166656C5.00913 0.166656 0.166626 5.01999 0.166626 11C0.166626 16.98 5.00913 21.8333 10.9891 21.8333C16.98 21.8333 21.8333 16.98 21.8333 11C21.8333 5.01999 16.98 0.166656 10.9891 0.166656ZM11 19.6667C6.21163 19.6667 2.33329 15.7883 2.33329 11C2.33329 6.21166 6.21163 2.33332 11 2.33332C15.7883 2.33332 19.6666 6.21166 19.6666 11C19.6666 15.7883 15.7883 19.6667 11 19.6667ZM5.58329 13.1667C6.42829 15.7017 8.52996 17.5 11 17.5C13.47 17.5 15.5716 15.7017 16.4166 13.1667H5.58329Z"
+                  fill="#2671E1"
+                />
+              </svg>
+            </div>
             <input
               type="text"
               placeholder="Write your message"
