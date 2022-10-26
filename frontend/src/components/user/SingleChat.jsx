@@ -136,9 +136,8 @@ function SingleChat({ newChat, setNewChat }) {
                         )}
                         <div
                           key={index}
-                          className={`${
-                            message.sender === userData.id ? "sent" : "received"
-                          } py-1 px-4`}
+                          className={`${message.sender === userData.id ? "sent" : "received"
+                            } py-1 px-4`}
                         >
                           <p className="text-sm pt-2">{message?.message}</p>
                           <small className="text-[8px] font-light float-right">
