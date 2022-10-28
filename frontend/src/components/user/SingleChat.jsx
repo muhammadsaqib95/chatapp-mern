@@ -7,23 +7,12 @@ import Moment from "react-moment";
 import { useMutation } from "@tanstack/react-query";
 import { newMessage } from "../../redux/reducer/chatSlice";
 import { useSelector, useDispatch } from "react-redux";
-// import { Peer } from "peerjs";
 import NewChat from "./NewChat";
 import { throttle } from "../utility";
 import { useSocket } from "../../Providers/socket";
-import EmojiPicker, {
-  EmojiStyle,
-  SkinTones,
-  Theme,
-  Categories,
-  EmojiClickData,
-  Emoji,
-  SuggestionMode,
-  SkinTonePickerLocation,
-} from "emoji-picker-react";
+import EmojiPicker from "emoji-picker-react";
 
 const throttledFunction = throttle((text, socket, user, chat) => {
-  // console.log("throttledFunction", text);
   socket.emit("typing", { user, chat });
 }, 2000);
 
@@ -66,21 +55,6 @@ function SingleChat({ newChat, setNewChat }) {
     },
   });
 
-  // useEffect(() => {
-  //   if (userData?.id) {
-  //     const peer = new Peer(userData?.id);
-  //     peer.on("open", (id) => {
-  //       console.log("peer id", id);
-  //     });
-  //     peer.on("call", (call) => {
-  //       console.log("call", call);
-  //       call.answer();
-  //       call.on("stream", (stream) => {
-  //         console.log("stream", stream);
-  //       });
-  //     });
-  //   }
-  // }, [userData]);
   function hanldeMessageType(e) {
     setUserInput(e.target.value);
     throttledFunction(e.target.value, socket, userData?.id, currentChat?._id);

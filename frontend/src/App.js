@@ -12,24 +12,27 @@ import "@fontsource/gothic-a1/700.css";
 import "@fontsource/gothic-a1/800.css";
 import "@fontsource/gothic-a1/900.css";
 import SocketProvider from "./Providers/socket";
+import PeerProvider from "./Providers/peer";
 function App() {
   const { user } = useUserContext();
   return (
     <>
       <BrowserRouter>
-        <SocketProvider>
-          <Routes>
-            <Route
-              path="/login"
-              element={user ? <Navigate to={"/chat"} /> : <Login />}
-            />
-            <Route
-              path="/chat/*"
-              element={user ? <Chat /> : <Navigate to={"/login"} />}
-            />
-            <Route path="/*" element={<Navigate to={"/login"} />} />
-          </Routes>
-        </SocketProvider>
+        <PeerProvider>
+          <SocketProvider>
+            <Routes>
+              <Route
+                path="/login"
+                element={user ? <Navigate to={"/chat"} /> : <Login />}
+              />
+              <Route
+                path="/chat/*"
+                element={user ? <Chat /> : <Navigate to={"/login"} />}
+              />
+              <Route path="/*" element={<Navigate to={"/login"} />} />
+            </Routes>
+          </SocketProvider>
+        </PeerProvider>
       </BrowserRouter>
     </>
   );

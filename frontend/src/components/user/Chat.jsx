@@ -18,8 +18,10 @@ import {
 } from "../../redux/reducer/chatSlice";
 import { useUserAllChats } from "../../Api/userChat";
 import ChatWidget from "../../assets/svg/ChatWidget";
+import { usePeer } from "../../Providers/peer";
 function Chat() {
   const { socket } = useSocket();
+  const { peer } = usePeer();
   const [newChat, setNewChat] = useState(false);
   const { setUser } = useUserContext();
   const dispatch = useDispatch();
@@ -77,6 +79,26 @@ function Chat() {
       socket.off("user-offline");
     }
   }, [socket]);
+
+
+  useEffect(() => {
+    if (peer) {
+      peer.on("open", (id) => {
+        console.log("peer id", id);
+      });
+      peer.on("call", (call) => {
+        console.log("call", call);
+        call.answer();
+        call.on("stream", (stream) => {
+          console.log("stream", stream);
+        });
+        call.on("close", () => {
+          console.log("close");
+        });
+      });
+    }
+  }, [peer]);
+
 
   return (
     <>

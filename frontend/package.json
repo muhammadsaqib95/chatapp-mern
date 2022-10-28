@@ -4,6 +4,7 @@
   "private": true,
   "proxy": "http://localhost:3001/",
   "dependencies": {
+    "@100mslive/react-sdk": "^0.4.4",
     "@fontsource/gothic-a1": "^4.5.8",
     "@reduxjs/toolkit": "^1.8.5",
     "@tailwindcss/line-clamp": "^0.4.2",
