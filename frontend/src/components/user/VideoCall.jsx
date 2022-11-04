@@ -35,22 +35,22 @@ export default function VideoCall(props) {
                         </h1>
                         <div>
                             <button className="bg-red-500 text-white px-4 py-2 rounded-full"
-                            onClick={() => {
-                                // props.socket.emit("end-call", {
-                                //     to: props.otherUser.socketId,
-                                // });
-                                let video = videoRef.current;
-                                // video.srcObject.getTracks().forEach((track) => {
-                                //     track.stop();
-                                // }
-                                // );
-                                // video.srcObject = null;
-                                video.pause();
-                                video.src = "";
-                                // props.setVideoCall(null);
-                                setLocalStream(null);
-                            }
-                            }
+                                onClick={() => {
+                                    // props.socket.emit("end-call", {
+                                    //     to: props.otherUser.socketId,
+                                    // });
+                                    let video = videoRef.current;
+                                    // video.srcObject.getTracks().forEach((track) => {
+                                    //     track.stop();
+                                    // }
+                                    // );
+                                    // video.srcObject = null;
+                                    video.pause();
+                                    video.src = "";
+                                    // props.setVideoCall(null);
+                                    setLocalStream(null);
+                                }
+                                }
                             >
                                 End Call
                             </button>
