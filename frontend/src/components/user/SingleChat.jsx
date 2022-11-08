@@ -70,7 +70,7 @@ function SingleChat({ newChat, setNewChat }) {
   return (
     <>
     {
-      videoCall && <VideoCall setVideoCall={setVideoCall} otherUser={otherUser} />
+      videoCall && <VideoCall setVideoCall={setVideoCall} otherUser={otherUser} from={userData}/>
     }
       {newChat ? (
         <NewChat />

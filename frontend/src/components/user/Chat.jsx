@@ -27,6 +27,7 @@ function Chat() {
   const dispatch = useDispatch();
   const { isLoading, data, error } = useUserDetails();
   const { data: userAllChats } = useUserAllChats();
+  const [incomingCall, setIncomingCall] = useState(null);
 
   useEffect(() => {
     if (userAllChats && data) {
@@ -54,6 +55,10 @@ function Chat() {
       socket.on("notTyping", (data) => {
         dispatch(userStopTyping(data));
       });
+      socket.on("call-made", async (data) => {
+        // console.log(data);
+        setIncomingCall(data.from);
+      });
 
       // socket.on("disconnect", () => {
       //   console.log("disconnect");
@@ -77,9 +82,8 @@ function Chat() {
       socket.off("notTyping");
       socket.off("user-online");
       socket.off("user-offline");
-    }
+    };
   }, [socket]);
-
 
   useEffect(() => {
     if (peer) {
@@ -99,9 +103,48 @@ function Chat() {
     }
   }, [peer]);
 
-
   return (
     <>
+      {incomingCall && (
+        <div className="fixed top-0 left-0 h-screen w-screen flex items-end md:items-center justify-center bg-gray-600 bg-opacity-70 shadow-md z-10">
+          <div className="bg-white w-full max-w-[450px] rounded-md py-8 m-3 md:m-0">
+            <div className="flex justify-center items-center p-4 flex-col gap-4">
+              <div className="min-w-[56px] w-14 min-h-[56px] h-14 rounded-full flex items-center justify-center bg-[#2671e121] uppercase font-bold">
+                {incomingCall.displayName[0]}
+              </div>
+              <div className="flex items-center">
+                <div className="ml-4">
+                  <h1 className="text-lg font-semibold">
+                    {incomingCall.displayName}
+                    <span className="font-normal text-base">
+                      &nbsp;is calling you
+                    </span>
+                  </h1>
+                </div>
+              </div>
+            </div>
+            <div className="flex items-center justify-center p-3 gap-4">
+              <button
+                className="bg-red-500 text-white px-4 py-2 rounded-full"
+                onClick={() => {
+                  socket.emit("call-decline", { id: incomingCall.id });
+                  setIncomingCall(null);
+                }}
+              >
+                Decline
+              </button>
+              <button className="bg-green-500 text-white px-4 py-2 rounded-full"
+              onClick={() => {
+                socket.emit("call-accept", { id: incomingCall.id, peer : peer._id });
+                setIncomingCall(null);
+              }}
+              >
+                Accept
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       <div className="bg-white header-shadow w-full">
         <div className="max-w-screen-xl w-full mx-auto flex items-center justify-between py-6">
           <h1 className="font-bold text-2xl">Chat App</h1>
@@ -139,7 +182,7 @@ function Chat() {
                 element={
                   <div className="flex items-center justify-center h-full">
                     <div className="flex flex-col items-center">
-                      <ChatWidget className='h-[300px]' />
+                      <ChatWidget className="h-[300px]" />
                       <h1 className="text-[#878787] text-lg mt-6">
                         Select a chat to start messaging
                       </h1>

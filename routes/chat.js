@@ -97,6 +97,26 @@ module.exports = {
               socket.broadcast.emit('user-offline', user._id);
           })
       });
+      socket.on('call-user', (data) => {
+        // console.log(data);
+        socket.broadcast.to(data.to).emit('call-made', {
+        //   offer: data.offer,
+        //   socket: socket.id
+        from : data.from,
+        });
+      });
+      socket.on('call-decline', (data) => {
+        socket.broadcast.to(data.id).emit('call-declined', {  
+            // from : data.from,
+        });
+      });
+      socket.on('call-accept', (data) => {
+        socket.broadcast.to(data.id).emit('call-accepted', {
+          // answer: data.answer,
+          // socket: socket.id
+          peer : data.peer,
+        });
+      });
       // console.log('a user connected from chat', socket.id, socket.rooms);
     });
   },

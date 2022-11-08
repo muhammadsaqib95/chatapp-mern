@@ -75,4 +75,60 @@ code {
   0%, 80%, 100% { box-shadow: 0 2.5em 0 -1.3em }
   40% { box-shadow: 0 2.5em 0 0 }
 }
-    
+
+.notification {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 7px 6px 10px;
+  gap: 10px;
+  width: 293px;
+  height: 40px;
+  background: #ffffff;
+  box-shadow: 0px 5px 30px rgba(43, 135, 218, 0.2);
+  border-radius: 5px;
+  margin-bottom: 10px;
+}
+.notification-wrapper {
+  position: fixed;
+  top: 125px;
+  right: 10px;
+  width: 300px;
+  z-index: 100;
+}
+.hidden {
+  animation: SlideRight 0.4s;
+  animation-fill-mode: forwards;
+}
+.open {
+  animation: SlideLeft 0.4s;
+  animation-fill-mode: forwards;
+}
+.notification-icon {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+}
+@keyframes SlideLeft {
+  0% {
+    margin-left: 120%;
+  }
+
+  100% {
+    margin-left: 0;
+  }
+}
+
+@keyframes SlideRight {
+  0% {
+    margin-left: 0;
+  }
+
+  100% {
+    margin-left: 120%;
+  }
+}
