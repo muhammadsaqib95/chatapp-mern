@@ -19,6 +19,7 @@ import {
 import { useUserAllChats } from "../../Api/userChat";
 import ChatWidget from "../../assets/svg/ChatWidget";
 import { usePeer } from "../../Providers/peer";
+import { useRef } from "react";
 function Chat() {
   const { socket } = useSocket();
   const { peer } = usePeer();
@@ -28,6 +29,9 @@ function Chat() {
   const { isLoading, data, error } = useUserDetails();
   const { data: userAllChats } = useUserAllChats();
   const [incomingCall, setIncomingCall] = useState(null);
+  const [localStream, setLocalStream] = useState(null);
+  const [remoteStream, setRemoteStream] = useState(null);
+  const remoteVid = useRef(null);
 
   useEffect(() => {
     if (userAllChats && data) {
@@ -92,9 +96,16 @@ function Chat() {
       });
       peer.on("call", (call) => {
         console.log("call", call);
-        call.answer();
+        navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then(
+          (stream) => {
+            call.answer(stream);
+            setLocalStream(stream);
+          });
+
         call.on("stream", (stream) => {
+          setRemoteStream(stream);
           console.log("stream", stream);
+
         });
         call.on("close", () => {
           console.log("close");
@@ -105,6 +116,14 @@ function Chat() {
 
   return (
     <>
+    {
+      remoteStream && <div className="fixed top-0 left-0 h-screen w-screen">
+        <video ref={remoteVid} className="w-full h-full" /> 
+      </div>
+    }
+    {
+      localStream && <video srcObject={localStream} autoPlay />
+    }
       {incomingCall && (
         <div className="fixed top-0 left-0 h-screen w-screen flex items-end md:items-center justify-center bg-gray-600 bg-opacity-70 shadow-md z-10">
           <div className="bg-white w-full max-w-[450px] rounded-md py-8 m-3 md:m-0">
