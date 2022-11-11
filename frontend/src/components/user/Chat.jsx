@@ -31,7 +31,9 @@ function Chat() {
   const [incomingCall, setIncomingCall] = useState(null);
   const [localStream, setLocalStream] = useState(null);
   const [remoteStream, setRemoteStream] = useState(null);
+  const [callSate, setCallState] = useState(null);
   const remoteVid = useRef(null);
+  const ownVid = useRef(null);
 
   useEffect(() => {
     if (userAllChats && data) {
@@ -95,35 +97,95 @@ function Chat() {
         console.log("peer id", id);
       });
       peer.on("call", (call) => {
-        console.log("call", call);
-        navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then(
-          (stream) => {
+        setCallState(call);
+        let own = ownVid.current;
+        own.muted = true;
+        
+        navigator.mediaDevices
+          .getUserMedia({ video: true, audio: true })
+          .then((stream) => {
             call.answer(stream);
             setLocalStream(stream);
+            own.srcObject = stream;
+            own.play();
           });
 
         call.on("stream", (stream) => {
           setRemoteStream(stream);
-          console.log("stream", stream);
+          // console.log("stream", stream);
+          // remoteVid.srcObject = stream;
+
+          let video = remoteVid.current;
+        video.muted = true;
+        video.srcObject = stream;
+        video.play();
+
+       
+
 
         });
+
         call.on("close", () => {
-          console.log("close");
+          console.log("call close 1");
         });
+
       });
     }
   }, [peer]);
 
+  useEffect(() => {
+    if (callSate){
+      callSate.on("close", () => {
+        console.log("call close");
+        let video = remoteVid.current;
+        video.srcObject.getTracks().forEach((track) => {
+          track.stop();
+        });
+        ownVid.current.srcObject.getTracks().forEach((track) => {
+          track.stop();
+        });
+        ownVid.current.srcObject = null;
+        video.srcObject = null;
+        setRemoteStream(null);
+      });
+    }
+  }, [callSate]);
   return (
     <>
-    {
-      remoteStream && <div className="fixed top-0 left-0 h-screen w-screen">
-        <video ref={remoteVid} className="w-full h-full" /> 
-      </div>
-    }
-    {
-      localStream && <video srcObject={localStream} autoPlay />
-    }
+      {
+        // <div className="relative">
+        <div
+          className={`fixed top-0 left-0 z-50 h-screen w-screen bg-white ${
+            remoteStream ? "block" : "hidden"
+          }`}
+        >
+
+            <div className="absolute top-0 left-0 h-full w-full z-[1]">
+              <video ref={remoteVid} className="w-full h-full" />
+            </div>
+          <div className=" absolute right-8 bottom-8 z-[2] ">
+            <video ref={ownVid} autoPlay className={`${localStream ? 'w-36 h-48' :"w-full h-full"}`} />
+          </div>
+          <div className="absolute left-1/2 bottom-16 z-[2]">
+              <button 
+              className="bg-red-500 text-white px-4 py-2 rounded-full"
+              onClick={() => {
+                callSate.close();
+                let video = remoteVid.current;
+                video.srcObject.getTracks().forEach((track) => {
+                  track.stop();
+                });
+                ownVid.current.srcObject.getTracks().forEach((track) => {
+                  track.stop();
+                });
+                ownVid.current.srcObject = null;
+                video.srcObject = null;
+                setRemoteStream(null);
+              }}>End Call</button>
+            </div>
+        </div>
+        // </div>
+      }
       {incomingCall && (
         <div className="fixed top-0 left-0 h-screen w-screen flex items-end md:items-center justify-center bg-gray-600 bg-opacity-70 shadow-md z-10">
           <div className="bg-white w-full max-w-[450px] rounded-md py-8 m-3 md:m-0">
@@ -152,11 +214,15 @@ function Chat() {
               >
                 Decline
               </button>
-              <button className="bg-green-500 text-white px-4 py-2 rounded-full"
-              onClick={() => {
-                socket.emit("call-accept", { id: incomingCall.id, peer : peer._id });
-                setIncomingCall(null);
-              }}
+              <button
+                className="bg-green-500 text-white px-4 py-2 rounded-full"
+                onClick={() => {
+                  socket.emit("call-accept", {
+                    id: incomingCall.id,
+                    peer: peer._id,
+                  });
+                  setIncomingCall(null);
+                }}
               >
                 Accept
               </button>

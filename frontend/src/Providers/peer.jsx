@@ -26,7 +26,9 @@ export function usePeer() {
 
 export default function PeerProvider({ children }) {
   const peer = useMemo(
-    () =>  new Peer(),
+    () =>  new Peer({
+      debug: 3,
+    }),
     []
   );
   return (
