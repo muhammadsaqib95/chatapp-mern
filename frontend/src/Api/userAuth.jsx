@@ -12,13 +12,13 @@ export const userLogin = async ({ username, password }) => {
     redirect: "follow",
   };
 
-  return fetch("http://localhost:3001/user/login", requestOptions)
+  return fetch("/user/login", requestOptions)
     .then((response) => response.json())
     .catch((error) => console.log("error", error));
 };
 
 export const getUser = async() => {
-  return axiosInstance.get("http://localhost:3001/user/getUser")
+  return axiosInstance.get("/user/getUser")
     .then((response) => response.data)
     .catch((error) => console.log("error", error));
 };
@@ -30,7 +30,7 @@ export function useUserDetails() {
 
 export async function searchUser(user) {
   try {
-    const response = await axiosInstance.get(`http://localhost:3001/user/${user}`);
+    const response = await axiosInstance.get(`/user/${user}`);
     return response.data;
   } catch (error) {
     return console.log("error", error);

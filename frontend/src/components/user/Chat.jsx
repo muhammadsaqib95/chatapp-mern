@@ -102,7 +102,7 @@ function Chat() {
         own.muted = true;
         
         navigator.mediaDevices
-          .getUserMedia({ video: true, audio: true })
+          .getUserMedia({ video: true, })
           .then((stream) => {
             call.answer(stream);
             setLocalStream(stream);
@@ -161,10 +161,10 @@ function Chat() {
         >
 
             <div className="absolute top-0 left-0 h-full w-full z-[1]">
-              <video ref={remoteVid} className="w-full h-full" />
+              <video ref={remoteVid} className="w-full h-full rotate-y-180" />
             </div>
           <div className=" absolute right-8 bottom-8 z-[2] ">
-            <video ref={ownVid} autoPlay className={`${localStream ? 'w-36 h-48' :"w-full h-full"}`} />
+            <video ref={ownVid} autoPlay className={`rotate-y-180 ${localStream ? 'w-64 h-48' :"w-full h-full"}`} />
           </div>
           <div className="absolute left-1/2 bottom-16 z-[2]">
               <button 

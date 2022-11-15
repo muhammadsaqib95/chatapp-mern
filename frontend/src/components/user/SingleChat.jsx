@@ -12,12 +12,14 @@ import { throttle } from "../utility";
 import { useSocket } from "../../Providers/socket";
 import EmojiPicker from "emoji-picker-react";
 import VideoCall from "./VideoCall";
+import { useNotification } from "../AppNotification/NotificationProvider";
 
 const throttledFunction = throttle((text, socket, user, chat) => {
   socket.emit("typing", { user, chat });
 }, 2000);
 
 function SingleChat({ newChat, setNewChat }) {
+  const notification = useNotification()
   const { socket } = useSocket();
   const lastMessageRef = useRef(null);
   const dispatch = useDispatch();
@@ -64,7 +66,12 @@ function SingleChat({ newChat, setNewChat }) {
 
   function handleVideoCall() {
     // socket.emit("call", { user: userData, otherUser });
+    if(otherUser?.isOnline) {
     setVideoCall(true);
+    }
+    else{
+      notification({type:"Error",message:"User is offline, Can't call right now"})
+    }
   }
 
   return (

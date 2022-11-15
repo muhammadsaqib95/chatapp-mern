@@ -10,7 +10,7 @@ export function useSocket() {
 export default function SocketProvider({ children }) {
   const socket = useMemo(
     () =>
-      io.connect("http://localhost:3001", {
+      io.connect("/", {
         auth: { token: localStorage.getItem("user_token") },
       }),
     []

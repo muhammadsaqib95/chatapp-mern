@@ -83,7 +83,7 @@ code {
   align-items: center;
   padding: 6px 7px 6px 10px;
   gap: 10px;
-  width: 293px;
+  width: max-content;
   height: 40px;
   background: #ffffff;
   box-shadow: 0px 5px 30px rgba(43, 135, 218, 0.2);
@@ -94,9 +94,8 @@ code {
   position: fixed;
   top: 125px;
   right: 10px;
-  width: 300px;
   z-index: 100;
-}
+} 
 .hidden {
   animation: SlideRight 0.4s;
   animation-fill-mode: forwards;
@@ -131,4 +130,7 @@ code {
   100% {
     margin-left: 120%;
   }
+}
+.rotate-y-180{
+  transform: rotateY(180deg);
 }

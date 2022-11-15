@@ -18,7 +18,7 @@ export default function VideoCall(props) {
     navigator.mediaDevices
       .getUserMedia({
         video: true,
-        audio: true,
+        // audio: true,
       })
       .then((stream) => {
         setLocalStream(stream);
@@ -49,7 +49,7 @@ export default function VideoCall(props) {
       navigator.mediaDevices
         .getUserMedia({
           video: true,
-          audio: true,
+          // audio: true,
         })
         .then((stream) => {
           setLocalStream(stream);
@@ -99,12 +99,12 @@ export default function VideoCall(props) {
       <div className="fixed top-0 left-0 z-50 h-screen w-screen bg-white block ">
         <div
           className={`absolute ${
-            remoteStream ? "right-8 bottom-8 " : "top-0 left-0 w-full h-full"
+            remoteStream ? "right-8 bottom-8  z-[2]" : "top-0 left-0 w-full h-full"
           } `}
         >
           <video
             ref={videoRef}
-            className={`${remoteStream ? "w-36 h-48" : "w-full h-full"}`}
+            className={`rotate-y-180 ${remoteStream ? "w-64 h-48" : "w-full h-full"}`}
           />
         </div>
         <div
@@ -112,7 +112,7 @@ export default function VideoCall(props) {
             remoteStream ? "contents" : "hidden"
           }`}
         >
-          <video ref={remoteVideoRef} className="w-full h-full" />
+          <video ref={remoteVideoRef} className=" rotate-y-180 w-full h-full" />
         </div>
         {remoteStream ? (
           <div className="absolute left-1/2 bottom-16 ">

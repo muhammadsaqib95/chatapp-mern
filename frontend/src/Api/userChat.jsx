@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { axiosInstance } from "./axiosInstance";
 export function getUserAllChats() {
-    return axiosInstance.get("http://localhost:3001/chat")
+    return axiosInstance.get("/chat")
         .then((response) => response.data)
         .catch((error) => console.log("error", error));
 }
@@ -24,7 +24,7 @@ export function sendChatMessage(data) {
       redirect: 'follow'
     };
     
-    return fetch("http://localhost:3001/chat/send-message", requestOptions)
+    return fetch("/chat/send-message", requestOptions)
       .then(response => response.json())
       .catch(error => error);
     

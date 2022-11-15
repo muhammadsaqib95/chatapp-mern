@@ -54,7 +54,7 @@ export default function Notification(props) {
         onMouseLeave={handleStartTimer}
         className={`notification ${exit ? "hidden" : "open"}`}
       >
-        <div className="flex items-center gap-10">
+        <div className="flex items-center gap-2">
           <div
             className="notification-icon"
             style={{
@@ -69,7 +69,7 @@ export default function Notification(props) {
         </div>
 
         <CrossIcon
-          className="w-4 h-4 cursor-pointer mr-1"
+          className="w-4 h-4 cursor-pointer mr-1 ml-2"
           fill="#4C5866"
           onClick={handleCloseNotification}
         />
