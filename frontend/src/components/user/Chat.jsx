@@ -100,9 +100,8 @@ function Chat() {
         setCallState(call);
         let own = ownVid.current;
         own.muted = true;
-        
         navigator.mediaDevices
-          .getUserMedia({ video: true, })
+          .getUserMedia({ video: true, audio: true })
           .then((stream) => {
             call.answer(stream);
             setLocalStream(stream);
@@ -150,6 +149,7 @@ function Chat() {
       });
     }
   }, [callSate]);
+  
   return (
     <>
       {

@@ -8,6 +8,7 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { store } from "./redux/store";
 import { Provider } from "react-redux";
 import NotificationProvider from "./components/AppNotification/NotificationProvider";
+import DeviceProvider from "./Providers/devices";
 
 export const queryClient = new QueryClient({
   defaultOptions: {
@@ -22,15 +23,17 @@ export const queryClient = new QueryClient({
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
-    <NotificationProvider>
-      <Provider store={store}>
-        <QueryClientProvider client={queryClient}>
-          <AuthProvider>
-            <App />
-          </AuthProvider>
-          <ReactQueryDevtools initialIsOpen={false} />
-        </QueryClientProvider>
-      </Provider>
-    </NotificationProvider>
+    <DeviceProvider>
+      <NotificationProvider>
+        <Provider store={store}>
+          <QueryClientProvider client={queryClient}>
+            <AuthProvider>
+              <App />
+            </AuthProvider>
+            <ReactQueryDevtools initialIsOpen={false} />
+          </QueryClientProvider>
+        </Provider>
+      </NotificationProvider>
+    </DeviceProvider>
   </React.StrictMode>
 );
