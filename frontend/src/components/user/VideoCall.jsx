@@ -4,8 +4,12 @@ import { useNotification } from "../AppNotification/NotificationProvider";
 import { usePeer } from "../../Providers/peer";
 import MuteIcon from "../../assets/svg/MuteIcon";
 import AudioIcon from "../../assets/svg/AudioIcon";
+import VideoIcon from "../../assets/svg/VideoIcon";
+import MuteVideoIcon from "../../assets/svg/MuteVideoIcon";
+import { useDevice } from "../../Providers/devices";
 
 export default function VideoCall(props) {
+  const { device } = useDevice();
   const notification = useNotification();
   const { socket } = useSocket();
   const { peer } = usePeer();
@@ -15,24 +19,46 @@ export default function VideoCall(props) {
   const [remotePeerId, setRemotePeerId] = useState(null);
   const videoRef = useRef(null);
   const remoteVideoRef = useRef(null);
+  const [isAudioMuted, setIsAudioMuted] = useState(false);
+  const [isVideoMuted, setIsVideoMuted] = useState(false);
+
+  navigator.permissions.query({ name: "camera" }).then(function (result) {
+    console.log(result);
+    if (result.state == "prompt") {
+      console.log("prompt");
+    }
+  });
+
   useEffect(() => {
     socket.emit("call-user", { to: props.otherUser._id, from: props.from });
-    
     navigator.mediaDevices
-      .getUserMedia({
-        video: true,
-        audio: true,
-      })
+      .getUserMedia(device)
       .then((stream) => {
         setLocalStream(stream);
+        setIsAudioMuted(stream.getAudioTracks()[0].enabled);
+        setIsVideoMuted(stream.getVideoTracks()[0].enabled);
         let video = videoRef.current;
         video.muted = true;
         video.srcObject = stream;
         video.play();
       })
       .catch((err) => {
+        if (err.name === "NotAllowedError") {
+          notification({
+            type: "Error",
+            message: "Please allow camera and microphone access",
+          });
+        }
         console.log(err);
       });
+    if (!device.video || !device.audio) {
+      notification({
+        type: "Error",
+        message: `Please allow access to ${
+          !device.video ? "camera" : "microphone"
+        }`,
+      });
+    }
   }, []);
   useEffect(() => {
     socket.on("call-declined", () => {
@@ -47,16 +73,17 @@ export default function VideoCall(props) {
     });
     socket.on("call-accepted", async (data) => {
       setRemotePeerId(data.peer);
-      // console.log('remote',data.peer);
-      // console.log('local',peer.id);
       navigator.mediaDevices
-        .getUserMedia({
-          video: true,
-          audio: true,
-        })
+        .getUserMedia({...device, video: device.video ? {
+          width: {min: 640, ideal: 1280, max: 1920},
+          height: {min: 480, ideal: 720, max: 1080},
+        } : false})
         .then((stream) => {
           setLocalStream(stream);
-
+          let video = videoRef.current;
+        video.muted = true;
+        video.srcObject = stream;
+        video.play();
           var call = peer.call(data.peer, stream);
           setCallState(call);
         })
@@ -96,7 +123,7 @@ export default function VideoCall(props) {
       // };
     }
   }, [callSate]);
-  console.log("local", callSate);
+  // console.log("local", videoRef.current?.getTracks()?.find((track) => track.kind === "audio"));
 
   return (
     <>
@@ -124,12 +151,38 @@ export default function VideoCall(props) {
         </div>
         {remoteStream ? (
           <div className="absolute left-1/2 bottom-16 flex items-center gap-3">
-            <button className="bg-[#F7F3F3] text-white px-2 py-2 rounded-full">
-              {/* <MuteIcon /> */}
-              <AudioIcon />
+            <button
+              className="bg-[#F7F3F3] text-white h-7 w-7 flex items-center justify-center rounded-full"
+              onClick={() => {
+                try {
+                  videoRef.current.srcObject.getTracks().forEach((track) => {
+                    if (track.kind === "video") {
+                      track.enabled = !track.enabled;
+                      setIsVideoMuted(!track.enabled);
+                    }
+                  });
+                } catch (error) {}
+              }}
+            >
+              {isVideoMuted ? <MuteVideoIcon /> : <VideoIcon />}
             </button>
             <button
-              className="bg-red-500 text-white px-2 py-2 rounded-full"
+              className="bg-[#F7F3F3] text-white h-7 w-7 flex items-center justify-center rounded-full"
+              onClick={() => {
+                try {
+                  videoRef.current.srcObject.getTracks().forEach((track) => {
+                    if (track.kind === "audio") {
+                      track.enabled = !track.enabled;
+                      setIsAudioMuted(!track.enabled);
+                    }
+                  });
+                } catch (error) {}
+              }}
+            >
+              {isAudioMuted ? <MuteIcon /> : <AudioIcon />}
+            </button>
+            <button
+              className="bg-red-500 text-white h-7 w-7 flex items-center justify-center rounded-full"
               onClick={() => {
                 for (let conns in peer.connections) {
                   console.log("conns", conns);
@@ -176,11 +229,13 @@ export default function VideoCall(props) {
                 <button
                   className="bg-red-500 text-white px-4 py-2 rounded-full"
                   onClick={() => {
-                    let video = videoRef.current;
-                    video.srcObject.getTracks().forEach((track) => {
-                      track.stop();
-                    });
-                    video.srcObject = null;
+                    try {
+                      let video = videoRef.current;
+                      video.srcObject.getTracks().forEach((track) => {
+                        track.stop();
+                      });
+                      video.srcObject = null;
+                    } catch (error) {}
                     props.setVideoCall(null);
                     setLocalStream(null);
                   }}
