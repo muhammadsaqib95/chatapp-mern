@@ -6,6 +6,7 @@ import MuteIcon from "../../assets/svg/MuteIcon";
 import AudioIcon from "../../assets/svg/AudioIcon";
 import VideoIcon from "../../assets/svg/VideoIcon";
 import MuteVideoIcon from "../../assets/svg/MuteVideoIcon";
+import ScreenIcon from "../../assets/svg/ScreenIcon";
 import { useDevice } from "../../Providers/devices";
 
 export default function VideoCall(props) {
@@ -23,7 +24,6 @@ export default function VideoCall(props) {
   const [isVideoMuted, setIsVideoMuted] = useState(false);
 
   navigator.permissions.query({ name: "camera" }).then(function (result) {
-    console.log(result);
     if (result.state == "prompt") {
       console.log("prompt");
     }
@@ -74,16 +74,21 @@ export default function VideoCall(props) {
     socket.on("call-accepted", async (data) => {
       setRemotePeerId(data.peer);
       navigator.mediaDevices
-        .getUserMedia({...device, video: device.video ? {
-          width: {min: 640, ideal: 1280, max: 1920},
-          height: {min: 480, ideal: 720, max: 1080},
-        } : false})
+        .getUserMedia({
+          ...device,
+          video: device.video
+            ? {
+                width: { min: 640, ideal: 1280, max: 1920 },
+                height: { min: 480, ideal: 720, max: 1080 },
+              }
+            : false,
+        })
         .then((stream) => {
           setLocalStream(stream);
           let video = videoRef.current;
-        video.muted = true;
-        video.srcObject = stream;
-        video.play();
+          video.muted = true;
+          video.srcObject = stream;
+          video.play();
           var call = peer.call(data.peer, stream);
           setCallState(call);
         })
@@ -123,7 +128,21 @@ export default function VideoCall(props) {
       // };
     }
   }, [callSate]);
-  // console.log("local", videoRef.current?.getTracks()?.find((track) => track.kind === "audio"));
+
+  function replaceStream() {
+    navigator.mediaDevices.getDisplayMedia(device).then((stream) => {
+      callSate.peerConnection.getSenders().forEach((sender) => {
+        if(sender.track.kind === "audio" && stream.getAudioTracks().length > 0){
+          sender.replaceTrack(stream.getAudioTracks()[0]);
+      }
+        if (sender.track.kind === "video" && stream.getVideoTracks().length > 0) {
+          sender.replaceTrack(stream.getVideoTracks()[0]);
+        }
+      });
+      videoRef.current.srcObject = stream;
+      videoRef.current.play();
+    });
+  }
 
   return (
     <>
@@ -151,6 +170,12 @@ export default function VideoCall(props) {
         </div>
         {remoteStream ? (
           <div className="absolute left-1/2 bottom-16 flex items-center gap-3">
+            <button
+              className="bg-[#F7F3F3] text-white h-7 w-7 flex items-center justify-center rounded-full"
+              onClick={replaceStream}
+            >
+              <ScreenIcon />
+            </button>
             <button
               className="bg-[#F7F3F3] text-white h-7 w-7 flex items-center justify-center rounded-full"
               onClick={() => {
