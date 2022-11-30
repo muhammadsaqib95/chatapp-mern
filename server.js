@@ -13,7 +13,7 @@ const jwt  = require("jsonwebtoken");
 app.use(cors(
 {
     origin: "*",
-    methods: ["GET", "POST", "PUT", "DELETE"],
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
 
 }
 
@@ -25,7 +25,7 @@ app.use(upload.array());
 const io = new Server(server, {
     cors: {
         origin: ["*", 'https://admin.socket.io', 'http://localhost:3000'],
-        methods: ["GET", "POST", "PUT", "DELETE"],
+        methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         credentials: true
     },
 });

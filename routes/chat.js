@@ -2,7 +2,7 @@ const router = require("express").Router();
 const Chat = require("../models/chat.model");
 const userAuth = require("../utility/userAuth");
 const User = require("../models/user.model");
-function debounce  (cb, delay = 1000) {
+function debounce(cb, delay = 1000) {
   let timeout;
   return (...args) => {
     clearTimeout(timeout);
@@ -14,7 +14,7 @@ function debounce  (cb, delay = 1000) {
 
 var socket1;
 const UserNotTyping = debounce((socket, data) => {
-  socket.broadcast.emit("notTyping",data);
+  socket.broadcast.emit("notTyping", data);
 }, 2000);
 router.route("/").get(userAuth, (req, res) => {
   Chat.find({ users: req.user.id })
@@ -79,42 +79,48 @@ module.exports = {
     socket1.on("connection", function (socket) {
       socket.on("join-room", (room) => {
         socket.join(room.id);
-        User.findByIdAndUpdate(room.id, { $set: { isOnline: true } }, { new: true })
-        .then(user => {
-            socket.broadcast.emit('user-online', user._id);
-        })
+        User.findByIdAndUpdate(
+          room.id,
+          { $set: { isOnline: true } },
+          { new: true }
+        ).then((user) => {
+          socket.broadcast.emit("user-online", user._id);
+        });
       });
-      socket.on('typing' , (data) => {
-        socket.broadcast.emit('typing', data);
+      socket.on("typing", (data) => {
+        socket.broadcast.emit("typing", data);
         UserNotTyping(socket, data);
         // socket.broadcast.to(data.room).emit('typing' , data);
-      })
-      socket.on('disconnect', function() {
-          // console.log('user disconnected', socket.user.id);
-          User.findByIdAndUpdate(socket.user.id, { $set: { isOnline: false } }, { new: true })
-          .then(user => {
-              // console.log(user , ' is offline');
-              socket.broadcast.emit('user-offline', user._id);
-          })
       });
-      socket.on('call-user', (data) => {
+      socket.on("disconnect", function () {
+        // console.log('user disconnected', socket.user.id);
+        User.findByIdAndUpdate(
+          socket.user.id,
+          { $set: { isOnline: false } },
+          { new: true }
+        ).then((user) => {
+          // console.log(user , ' is offline');
+          socket.broadcast.emit("user-offline", user._id);
+        });
+      });
+      socket.on("call-user", (data) => {
         // console.log(data);
-        socket.broadcast.to(data.to).emit('call-made', {
-        //   offer: data.offer,
-        //   socket: socket.id
-        from : data.from,
+        socket.broadcast.to(data.to).emit("call-made", {
+          //   offer: data.offer,
+          //   socket: socket.id
+          from: data.from,
         });
       });
-      socket.on('call-decline', (data) => {
-        socket.broadcast.to(data.id).emit('call-declined', {  
-            // from : data.from,
+      socket.on("call-decline", (data) => {
+        socket.broadcast.to(data.id).emit("call-declined", {
+          // from : data.from,
         });
       });
-      socket.on('call-accept', (data) => {
-        socket.broadcast.to(data.id).emit('call-accepted', {
+      socket.on("call-accept", (data) => {
+        socket.broadcast.to(data.id).emit("call-accepted", {
           // answer: data.answer,
           // socket: socket.id
-          peer : data.peer,
+          peer: data.peer,
         });
       });
       // console.log('a user connected from chat', socket.id, socket.rooms);
