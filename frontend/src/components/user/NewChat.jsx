@@ -3,6 +3,8 @@ import { Children, useState } from "react";
 import { searchUser } from "../../Api/userAuth";
 import { useDispatch, useSelector } from "react-redux";
 import { getSearchResults } from "../../redux/reducer/userSlice";
+import { createChat } from "../../Api/userChat";
+import { useNavigate } from "react-router-dom";
 
 const updateDebounceText = debounce((text, dispatch) => {
   if (text.trim().length > 0) {
@@ -14,6 +16,7 @@ const updateDebounceText = debounce((text, dispatch) => {
 
 export default function NewChat() {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const searchResult = useSelector((state) => state.user.searchResults);
   const [search, setSearch] = useState("");
   function handleSearch(event) {
@@ -41,7 +44,16 @@ export default function NewChat() {
             Children.toArray(
               searchResult.map((user) => {
                 return (
-                  <div className="flex items-center py-3 px-7 border-b border-b-[#EAEEF2] hover:bg-[#F5F5F5]">
+                  <div
+                    className="flex items-center py-3 px-7 border-b border-b-[#EAEEF2] hover:bg-[#F5F5F5]"
+                    onClick={() => {
+                      createChat(user.id).then((data) => {
+                        if (data) {
+                          navigate(`/chat/${data._id}`);
+                        }
+                      });
+                    }}
+                  >
                     <div className="w-12 h-12 rounded-full bg-[#e5ecfb] flex items-center justify-center">
                       {user.displayName[0]}
                     </div>

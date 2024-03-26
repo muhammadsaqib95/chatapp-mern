@@ -1,5 +1,5 @@
 import { Children, useEffect } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { useUserDetails } from "../../Api/userAuth";
 import { useUserAllChats } from "../../Api/userChat";
 import { useSelector } from "react-redux";
@@ -7,14 +7,14 @@ export default function ChatList({setNewChat}) {
   const { data: userData } = useUserDetails();
   const  chatRoute  = useParams();
   const data = useSelector((state) => state.chat.chats);
-
+  const navigate = useNavigate();
 
   return (
     <>
       <div className="flex justify-between mt-8">
         <div className="flex items-center justify-between w-full">
           <h3 className="font-semibold text-base">Chats</h3>
-          <div onClick={() => {setNewChat((previousState) => !previousState)}} className='cursor-pointer'>
+          <div onClick={() => {setNewChat((previousState) => !previousState); navigate('/chat/add')}} className='cursor-pointer'>
             <svg
               width="29"
               height="29"
